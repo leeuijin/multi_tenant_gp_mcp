@@ -1,0 +1,85 @@
+==========================================================================
+환경설정 - claude_desktop_config.json (Claude Desktop에서 mcp.json 역활)
+==========================================================================
+
+$ pwd
+/Users/uijinl/Library/Application Support/Claude
+$
+$ cat claude_desktop_config.json
+{
+  "mcpServers": {
+    "greenplum-gpadmin": {
+      "type": "http",
+      "url": "http://127.0.0.1:8083/mcp",
+      "headers": {
+        "Authorization": "Basic Z3BhZG1pbjpjaGFuZ2VtZQ=="
+      }
+    },
+    "greenplum-sales1": {
+      "type": "http",
+      "url": "http://127.0.0.1:8083/mcp",
+      "headers": {
+        "Authorization": "Basic c2FsZXMxOnNhbGVzX3Bhc3M="
+      }
+    },
+    "greenplum-marketinguser1": {
+      "type": "http",
+      "url": "http://127.0.0.1:8083/mcp",
+      "headers": {
+        "Authorization": "Basic bWFya2V0aW5ndXNlcjE6bWt0X3Bhc3M="
+      }
+    }
+  },
+  "coworkUserFilesPath": "/Users/uijinl/Claude",
+  "preferences": {
+    "coworkScheduledTasksEnabled": false,
+    "coworkHipaaRestricted": false,
+    "ccdScheduledTasksEnabled": false,
+    "bypassPermissionsGateByAccount": {
+      "8d7a87c2-7045-4821-befb-baa51051e94e": false,
+      "499336c7-684a-4eb0-b4d1-cbe930e3523d": false
+    },
+    "coworkWebSearchEnabled": false,
+    "coworkModelAutoFallbackByAccount": {
+      "8d7a87c2-7045-4821-befb-baa51051e94e": true,
+      "499336c7-684a-4eb0-b4d1-cbe930e3523d": true
+    },
+    "remoteToolsDeviceName": "c02g64stmd6t",
+    "epitaxyPrefs": {
+      "starred-local-code-sessions": [],
+      "starred-cowork-spaces": [],
+      "starred-session-groups": [],
+      "dframe-local-slice": {
+        "pinnedOrder": [],
+        "customGroupAssignments": {},
+        "customGroupOrder": {}
+      },
+      "ccd-sessions-filter": {
+        "state": {
+          "selectedProjects": []
+        },
+        "version": 0
+      }
+    }
+  }
+}%
+==========================================================================
+설명
+==========================================================================
+- 테넌트(계정) 구분은 claude_desktop_config.json에 미리 등록된 3개의 커넥터(greenplum-gpadmin/greenplum-sales1/greenplum-marketinguser1)로 고정되어 있음 
+— 각각 Basic Auth 헤더가 하드코딩된 정적 설정 (ID:PASSWORD 를 base64로 변환하여 claude_desktop_config.json 에서 Authorization 항목에 작성)
+- 실제 격리(isolation)는 애플리케이션 로직이 아니라 GPDB 자체의 권한 시스템(permission denied for database)이 담당
+- 대화에서 "sales1 계정으로"라고 하면, Claude가 대화 맥락에서 알아서 크레덴셜을 만들어내는 게 아니라 미리 준비된 3개 커넥터 중 하나를 선택하는 것
+(basic 방식: ID:PW를 base64로 인코딩하여 작성)
+
+ex)
+$ echo -n 'ID:PW' | base64
+SUQ6UFc=
+$ echo -n 'SUQ6UFc=' | base64 -d
+ID:PW%
+
+- 테넌트(계정) 구분은 claude_desktop_config.json에 미리 등록된 3개의 커넥터(greenplum-gpadmin/greenplum-sales1/greenplum-marketinguser1)로 고정되어 있음 
+— 각각 Basic Auth 헤더가 하드코딩된 정적 설정 (ID:PASSWORD 를 base64로 변환하여 claude_desktop_config.json Authorization 항목에 작성)
+- 실제 격리(isolation)는 애플리케이션 로직이 아니라 GPDB 자체의 권한 시스템(permission denied for database)이 담당
+- 대화에서 "sales1 계정으로"라고 하면, Claude가 대화 맥락에서 알아서 크레덴셜을 만들어내는 게 아니라 미리 준비된 3개 커넥터 중 하나를 선택하는 것
+
