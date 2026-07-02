@@ -1,0 +1,49 @@
+==========================================================================
+MCP Server 환경설정 - config.yaml
+==========================================================================
+
+uijinl@C02G64STMD6T mcp % cat /Users/uijinl/mcp/config.yaml
+mcp:
+    home: /Users/uijinl/.gp_mcp
+    host: 0.0.0.0
+    port: 8083
+    endpoint: /mcp
+    allow-non-local-without-tls: true
+    log-path: .gp_mcp/server.log
+    log-level: info
+    tls-enable: false
+    tls-cert: "server.crt"
+    tls-key: "server.key"
+    tls-ca: ""
+    tls-client-auth: ""
+    max-connections: 50
+service:
+    gpdb:
+        host: "172.16.200.161"
+        port: "5432"
+        database: "kbc"
+        username: "gpadmin"
+        password: "changeme"
+        plan_analyzer:
+            threshold_high_rows: 100000
+            threshold_huge_rows: 1e+06
+            threshold_skew_ratio: 1.5
+            threshold_estimation_over: 10
+            threshold_estimation_under: 0.1
+            threshold_missing_index_rows: 100000
+            threshold_partition_scan: 100
+            threshold_optimizer_diff_percent: 10
+            threshold_func_pred_cost: 100
+            threshold_func_pred_rows: 1000
+        sslmode: disable
+auth:
+    enabled: true
+    type: "basic"
+    rate_limit_failures: 50
+# GPMCP 서버 구동
+$gp-mcp-server streamable-http --port 8083 --config-file=/Users/uijinl/mcp/config.yaml
+
+# GPMCP 서버 구동 확인
+$ ps -ef |grep mcp
+  502 17227     1   0  9:07오후 ??         0:00.11 gp-mcp-server streamable-http --port 8083 --config-file=/Users/uijinl/mcp/config.yaml --home /Users/uijinl/.gp_mcp
+  502 34752 70328   0  9:19오후 ttys003    0:00.01 grep mcp
