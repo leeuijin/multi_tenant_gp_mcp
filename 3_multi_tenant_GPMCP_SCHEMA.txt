@@ -1,0 +1,39 @@
+1. Create Databases
+CREATE DATABASE marketing_db;
+CREATE DATABASE sales_db;
+
+2. Create Users
+CREATE USER marketinguser1 WITH PASSWORD 'mkt_pass';
+CREATE USER sales1 WITH PASSWORD 'sales_pass';
+
+3. Grant Database Access
+– Give each user access only to their database
+GRANT CONNECT ON DATABASE marketing_db TO marketinguser1;
+GRANT CONNECT ON DATABASE sales_db TO sales1;
+
+
+– Revoke access from public (optional but recommended for isolation)
+
+REVOKE CONNECT ON DATABASE marketing_db FROM PUBLIC;
+REVOKE CONNECT ON DATABASE sales_db FROM PUBLIC;
+
+
+4. Grant appropriate Permissions (inside each DB)
+
+Connect to each database and grant object-level permissions:
+– Connect to marketing_db first
+
+
+
+\c marketing_db
+GRANT USAGE ON SCHEMA public TO marketinguser1;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO marketinguser1;
+\c marketing_db marketinguser1
+create table mkt_test (c1 int,c2 int);
+
+– Connect to sales_db
+\c sales_db
+GRANT USAGE ON SCHEMA public TO sales1;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO sales1;
+\c sales_db sales1
+create table test_sales (c1 int,c2 int);
