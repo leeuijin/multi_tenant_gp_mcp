@@ -3,7 +3,7 @@ Building a centralized multi-tenant GP-MCP server &amp; Claude desktop
 
 <img width="1024" height="864" alt="multi_tenant_gpmcp_eng" src="https://github.com/user-attachments/assets/f76aeef1-2216-407f-b366-52e0e5b94e3f" />
 
-# Centralized multitenant gp_mcp![Uploading multitenant_gpmcp.jpg...]()
+# Centralized multitenant gp_mcp Architecture
 
 - 1 gp-mcp-server process, 1 port (8083) handles requests from all accounts in common
 - The GPDB's own authority system (permission denied for database) is responsible for the actual isolation, not application logic
@@ -13,7 +13,7 @@ Building a centralized multi-tenant GP-MCP server &amp; Claude desktop
 - 
 <img width="1024" height="864" alt="multitenant_gpmcp" src="https://github.com/user-attachments/assets/841964ed-0839-4229-9f8c-75fc2c4b801d" />
 
-# 중앙집중형 멀티테넌트 gp_mcp![Uploading multitenant_gpmcp.jpg…]()
+# 중앙집중형 멀티테넌트 gp_mcp Architecture
 
 - gp-mcp-server 프로세스 1개, 포트 1개(8083)가 모든 계정의 요청을 공통으로 처리
 - 실제 격리(isolation)는 애플리케이션 로직이 아니라 GPDB 자체의 권한 시스템(permission denied for database)이 담당
