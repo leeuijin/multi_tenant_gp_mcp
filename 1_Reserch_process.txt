@@ -1,0 +1,81 @@
+==========================================================================
+[KOR]MCP 아키텍쳐별 장단점
+==========================================================================
+
+여러 사용자가 서로 다른 데이터베이스(DB)를 다루는 환경에서 Model Context Protocol(MCP) 서버를 효율적으로 설정하고 아키텍처를 설계하는 방법은 '격리 수준'과 '관리의 편의성'에 따라 크게 3가지 방향으로 나눌 수 있습니다.
+
+상황에 맞는 최적의 접근법을 선택해 보세요.
+
+1. 사용자별 독립형 배포 
+각 사용자(또는 사용자 그룹)가 자신만의 전용 MCP 서버 인스턴스를 실행하는 방식입니다. 안전성과 보안이 중요한 환경에서 가장 추천하는 구조입니다.
+
+설정 방법:
+
+사용자별로 MCP 서버 컨테이너(Docker 등)를 독립적으로 띄웁니다.
+각 서버 인스턴스의 환경 변수(DB_CONNECTION_STRING)에 해당 사용자가 접근해야 하는 DB 연결 정보를 주입합니다.
+사용자의 클라이언트(Claude Desktop, Cursor 등)는 본인에게 할당된 MCP 서버의 엔드포인트(SSE 또는 Stdio)로 연결합니다.
+
+장점: 하나의 DB 정보가 유출되거나 서버가 다운되어도 다른 사용자에게 영향을 주지 않으며, 완전한 데이터 격리가 가능합니다.
+단점: 사용자가 많아질수록 관리해야 하는 컨테이너와 인프라 리소스가 늘어납니다.
+
+2. 중앙 집중형 멀티테넌트(Multi-tenant) MCP 서버 구축
+하나의 대형 MCP 서버를 구축하고, 이 서버가 여러 DB 연결을 동시에 관리하면서 사용자 요청에 따라 동적으로 라우팅하는 방식입니다.
+
+설정 방법:
+MCP 서버 내부에 사용자별 DB 연결 풀(Connection Pool)을 맵(Map) 형태로 관리합니다.
+클라이언트가 MCP 서버에 요청을 보낼 때, 헤더나 인증 토큰, 또는 프로프트를 통해 사용자 식별자(User ID)를 함께 전달하도록 합니다.
+MCP 서버는 요청을 받을 때 식별자를 확인하고, db_connections[user_id]와 같이 매핑된 DB로 쿼리를 실행합니다.
+
+장점: 단 하나의 서버 프로세스만 관리하면 되므로 운영 및 업데이트가 매우 간편하고 리소스 효율성이 높습니다.
+단점: 서버 코드 내에서 사용자 격리 로직을 완벽하게 구현하지 않으면 타인의 DB에 접근하는 보안 사고가 발생할 수 있습니다.
+
+3. 동적 컨텍스트(Dynamic Context) 주입 방식
+MCP 서버 자체에는 DB 연결 정보를 고정하지 않고, LLM 클라이언트가 요청할 때마다 연결 정보를 도구(Tool)의 인자(Arguments)로 넘겨받는 방식입니다.
+
+설정 방법:
+MCP 서버의 read_query나 execute_sql 같은 도구의 스키마에 connection_string 또는 db_name을 필수 인자로 정의합니다.
+클라이언트(사용자 측) 설정 파일에서 MCP 서버를 등록할 때, 해당 인자 값을 고정값으로 주입하도록 설정합니다.
+
+장점: MCP 서버가 특정 DB에 종속되지 않으므로 가장 유연하며, 서버 측 설정이 단순해집니다.
+단점: 연결 문자열 같은 민감한 정보가 클라이언트 사이드나 LLM 컨텍스트를 거쳐 전달될 수 있어 보안상 주의가 필요합니다.
+
+==========================================================================
+[ENG]Advantages and disadvantages of each MCP architecture 
+==========================================================================
+
+In environments where multiple users are dealing with different databases (DBs), how to efficiently set up Model Context Protocol (MCP) servers and design architectures can be divided into three main directions: 'Quarantine Level' and 'Ease of Management'.
+
+Choose the best approach for your situation.
+
+1. Standalone deployment by user 
+This is how each user (or group of users) runs their own dedicated MCP server instance, which is the most recommended structure for safety and security-critical environments.
+
+To set up:
+
+Floats the MCP server container (such as Docker) independently for each user.
+Injects the DB connection information that users need to access into the environment variable (DB_CONNECTION_STRING) for each server instance.
+Your client (such as Claud Desktop or Cursor) connects to the endpoint (SSE or Stdio) of the MCP server assigned to you.
+
+Advantages: Even if one DB information is leaked or the server goes down, it does not affect other users, and complete data isolation is possible.
+The downside: More users have more containers and infrastructure resources to manage.
+
+2. Building a centralized multi-tenant MCP server
+It's a way to build one large MCP server, which manages multiple DB connections simultaneously and dynamically routes them according to user requests.
+
+To set up:
+Manage the user-specific DB connection pool (Connection Pool) in the form of a map inside the MCP server.
+When the client sends a request to the MCP server, it is intended to pass the user identifier (User ID) together through a header or authentication token, or a prompt.
+The MCP server checks the identifier when it receives the request and executes the query with the mapped DB, such as db_connections [user_id].
+
+Advantages: Only one server process needs to be managed, making operations and updates very simple and resource efficient.
+Cons: Failure to fully implement user isolation logic within the server code can result in security incidents accessing other people's DBs.
+
+3. Dynamic Context Injection Method
+It is a method of not fixing DB connection information to the MCP server itself, but taking over the connection information as Arguments of the tool whenever the LLM client requests it.
+
+To set up:
+Define connection_string or db_name as required factors in the schema of tools such as read_query or execute_sql on the MCP server.
+When registering an MCP server in a client (user-side) setup file, set the corresponding factor value to be injected to a fixed value.
+
+Advantage: MCP servers are most flexible because they are not dependent on specific DBs, simplifying server-side settings.
+Disadvantages: Sensitive information, such as connection strings, can be passed through the client side or LLM context, requiring security attention.
