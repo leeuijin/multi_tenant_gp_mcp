@@ -1,5 +1,3 @@
-# multi_tenant_gp_mcp 
-Building a centralized multi-tenant GP-MCP server with Claude desktop
 <img width="1024" height="864" alt="multitenant_gpmcp" src="https://github.com/user-attachments/assets/841964ed-0839-4229-9f8c-75fc2c4b801d" />
 
 # 중앙집중형 멀티테넌트 gp_mcp Architecture
