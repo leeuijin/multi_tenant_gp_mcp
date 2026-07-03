@@ -72,6 +72,7 @@ $ cat claude_desktop_config.json
 - 대화에서 "sales1 계정으로"라고 하면, Claude가 대화 맥락에서 알아서 크레덴셜을 만들어내는 게 아니라 미리 준비된 3개 커넥터 중 하나를 선택하는 것
 (basic 방식: ID:PW를 base64로 인코딩하여 작성)
 
+터미널에서 아래와 같이 명령어를 통해 base64 구문으로 변경 가능합니다.
 ex)
 $ echo -n 'ID:PW' | base64
 SUQ6UFc=
