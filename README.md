@@ -1,4 +1,4 @@
-<img width="1024" height="864" alt="multitenant_gpmcp" src="https://github.com/user-attachments/assets/841964ed-0839-4229-9f8c-75fc2c4b801d" />
+<img width="972" height="534" alt="스크린샷 2026-07-03 12 57 55" src="https://github.com/user-attachments/assets/79336bdb-a970-41a4-b3eb-669469d57b8c" />
 
 # 중앙집중형 멀티테넌트 gp_mcp Architecture
 
