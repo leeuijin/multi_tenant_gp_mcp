@@ -63,14 +63,16 @@ $ cat claude_desktop_config.json
     }
   }
 }%
+
 ==========================================================================
 설명
 ==========================================================================
-- 테넌트(계정) 구분은 claude_desktop_config.json에 미리 등록된 3개의 커넥터(greenplum-gpadmin/greenplum-sales1/greenplum-marketinguser1)로 고정되어 있음 
+- 테넌트(계정) 구분은 claude_desktop_config.json에 미리 등록된 3개의 커넥터(greenplum-gpadmin/greenplum-sales1/greenplum-marketinguser1)로 고정 
 — 각각 Basic Auth 헤더가 하드코딩된 정적 설정 (ID:PASSWORD 를 base64로 변환하여 claude_desktop_config.json 에서 Authorization 항목에 작성)
-- 실제 격리(isolation)는 애플리케이션 로직이 아니라 GPDB 자체의 권한 시스템(permission denied for database)이 담당
-- 대화에서 "sales1 계정으로"라고 하면, Claude가 대화 맥락에서 알아서 크레덴셜을 만들어내는 게 아니라 미리 준비된 3개 커넥터 중 하나를 선택하는 것
 (basic 방식: ID:PW를 base64로 인코딩하여 작성)
+- 대화에서 "sales1 계정으로"라고 하면, Claude가 대화 맥락에서 알아서 크레덴셜을 만들어내는 게 아니라 미리 준비된 3개 커넥터 중 하나를 선택하는 것
+- 실제 격리(isolation)는 애플리케이션 로직이 아니라 GPDB 데이터베이스 자체의 권한 시스템(permission denied for database)으로 관리
+- claude_desktop_config.json 수정 후에는 반드시 claude desktop을 종료후 재시작 필요 
 
 터미널에서 아래와 같이 명령어를 통해 base64 구문으로 변경 가능합니다.
 ex)
@@ -79,9 +81,4 @@ SUQ6UFc=
 $ echo -n 'SUQ6UFc=' | base64 -d
 ID:PW%
 
-- 테넌트(계정) 구분은 claude_desktop_config.json에 미리 등록된 3개의 커넥터(greenplum-gpadmin/greenplum-sales1/greenplum-marketinguser1)로 고정되어 있음 
-— 각각 Basic Auth 헤더가 하드코딩된 정적 설정 (ID:PASSWORD 를 base64로 변환하여 claude_desktop_config.json Authorization 항목에 작성)
-- 실제 격리(isolation)는 애플리케이션 로직이 아니라 GPDB 자체의 권한 시스템(permission denied for database)이 담당
-- 대화에서 "sales1 계정으로"라고 하면, Claude가 대화 맥락에서 알아서 크레덴셜을 만들어내는 게 아니라 미리 준비된 3개 커넥터 중 하나를 선택하는 것
-- claude_desktop_config.json 수정 후에는 반드시 claude desktop을 종료후 재시작 필요 
 
